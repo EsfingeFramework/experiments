@@ -93,7 +93,7 @@ Also do not need any reference to the framework. When the A/B test is not needed
 ### Internal structure
 
 
-![alt text](https://github.com/SimonGschnell/experiments/blob/master/diagram2.png?raw=true)
+![alt text](https://github.com/SimonGschnell/experiments/blob/master/model.PNG?raw=true)
 
 *Figure 2.*
 
