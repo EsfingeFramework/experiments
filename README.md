@@ -17,12 +17,11 @@ Additionally it provides an extension point allowing the inclusion of new kinds 
 
 Besides the proxy creation, no further reference for the A/B tests is needed neither in the implementations or in the code invoking them.
 
-***Framework model
+### Framework model
 
 
-
-//placeholder for image
-
+![alt text](https://github.com/SimonGschnell/experiments/blob/master/diagram.png?raw=true)
+*Figure 1*
 
 
 **Figure 1** is a graphical representation of the model. The fire icon marked elements represent
@@ -37,9 +36,7 @@ The framework model defines the definition of measurements to be collected in th
 The framework provides an extension point to allow the implementation of new metrics through the definition of new types of metadata. 
 
 
-
-
-***Reference implementation for this framework model for the java language
+### Reference implementation for this framework model for the java language
 
 Scenario:
 Two different implementations of printing to the console, where each implementation requires a different amount of time to finish execution.
@@ -48,24 +45,27 @@ First step:
 define an interface to abstract the interaction with the alternative implementations. 
  
 
-//placeholder for image
+![alt text](https://github.com/SimonGschnell/experiments/blob/master/abstract%20interface.PNG?raw=true)
 
+*Listing 1.*
 
-
-Listing 1.
 
 The interface in listing 1 abstracts the behavior for our implementations that will print on the console. The interface receives annotations to configure the metrics, in this case @AverageExecutionTime will collect the execution time measurement for each implementation.
 
-Listing 2.
+
+![alt text](https://github.com/SimonGschnell/experiments/blob/master/annotation.PNG?raw=true)
+*Listing 2.*
+
 
 @AverageExecutionTime is an annotation that uses @MetricsGenerator to specify the class that implements the collection of the execution time metrics.
-
-Listing3.
 
 For this example we want to record the individuall execution times of the implementations and print the average execution time of each implementation at the end.
 This requires us to create an extension point for our MetricRecorder hotspot:
 
-Listing 4.
+
+![alt text](https://github.com/SimonGschnell/experiments/blob/master/MetricsRecorder.PNG?raw=true)
+*Listing 3.*
+
 
 In the extension point MetricRecorderAveragePrinter we check from which implementation the collected metric is coming from and then persist the result in a corresponding list. At the end of testing we can call the getAverageWaitingTime() function to see the average of both implementations.
 
@@ -73,20 +73,30 @@ last step:
 Create the factory method responsible to instantiate the proxy that performs the A/B tests.
 
 
+![alt text](https://github.com/SimonGschnell/experiments/blob/master/builder.PNG?raw=true)
+*Listing 4.*
 
-//image placeholder
 
-
-
-In Listing 2, it's visible how the builder is used to configure the selector and the class responsible for handling the metrics. We used MetricRecorderAveragePrinter which is an implementation of MetricRecorder, to persist the metrics.
+In Listing 4, the builder is used to configure the selector and the class responsible for handling the metrics. We used MetricRecorderAveragePrinter which is an implementation of MetricRecorder, to persist the metrics.
 
 
 To illustrate how the application became decoupled from the A/B test 
- 
-Listing 3. Shows how a MenuItensOrganizer instance is created and used. The implementations
+
+
+![alt text](https://github.com/SimonGschnell/experiments/blob/master/main.PNG?raw=true)
+*Listing 5.*
+
+
+Listing 5. Shows how a Implementation instance is created and used. The implementations
 Also do not need any reference to the framework. When the A/B test is not needed anymore, only the factory needs to be changed to return the chosen implementation. 
 
-***Internal structure
+### Internal structure
+
+
+![alt text](https://github.com/SimonGschnell/experiments/blob/master/diagram2.png?raw=true)
+
+*Figure 2.*
+
 
 Figure 2 shows the framework’s architecture with its main
 classes, highlighting the extension points (hotspots) with a fire
