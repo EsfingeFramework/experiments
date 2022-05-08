@@ -162,7 +162,7 @@ To illustrate how the application became decoupled from the A/B test :
 The Main class shows how a Implementation instance is created and used. The implementations also do not need any
 reference to the framework. When the A/B test is not needed anymore, only the factory needs to be changed to return the chosen implementation. 
 
-#### result
+#### Result
 **The collected average execution times of the different implementations are visible in the MetricResult when executing the A/B test.**
 
 ```
