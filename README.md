@@ -43,6 +43,7 @@ The framework provides an extension point to allow the implementation of new met
 
 #### First step:
 **Define an interface to abstract the interaction with the alternative implementations.**
+
 The interface ImplementationInterface will be created.
  
 ```
@@ -57,6 +58,7 @@ The interface abstracts the behavior for our implementations that will print on 
 
 #### Second step:
 **Define how the average execution time of the implementations should be measured**
+
 The Annotation AverageExecutionTime and the class AverageExecutionTimeGenerator will be created.
 
 ```
