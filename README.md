@@ -53,74 +53,9 @@ public interface ImplementationInterface {
 }
 ```
 
-The interface abstracts the behavior for our implementations that will print on the console. The interface receives annotations to configure the metrics, in this case @AverageExecutionTime will collect the average execution time measurement for each implementation. 
-(@AverageExecutionTime is a custom extension-point of the Metrics hotspot)
+The interface abstracts the behavior for our implementations that will print on the console. The interface receives annotations to configure the metrics, in this case @TimeMetrics will collect the execution time measurement for each implementation. 
+(@TimeMetrics is a predefiend extension-point of the Metrics hotspot)
 
-#### Second step:
-**Define how the average execution time of the implementations should be measured**
-
-The Annotation AverageExecutionTime and the class AverageExecutionTimeGenerator will be created.
-
-```
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@MetricsGenerator(AverageExecutionTimeGenerator.class)
-public @interface AverageExecutionTime {
-}
-```
-
-@AverageExecutionTime is an annotation that uses @MetricsGenerator to specify the class that implements the collection of the average execution time metrics.
-AverageExecutionTimeGenerator is the class we have to create and will contain the logic to capture the average execution time.
-
-```
-public class AverageExecutionTimeGenerator implements Metrics {
-    private MetricRecorder metricRecorder;
-    private Instant startExecution;
-    private List<Double> averageExecutionImpl1 = new ArrayList<>();
-    private List<Double> averageExecutionImpl2 = new ArrayList<>();
-
-    private double averageExecutionTime(List<Double> list){
-        double result=0;
-        for(double time : list){
-            result+=time;
-        }
-        return result / (double)list.size();
-    }
-
-    @Override
-    public MetricRecorder getMetricRecorder() {
-        return this.metricRecorder;
-    }
-
-    @Override
-    public void setMetricRecorder(MetricRecorder metricRecorder) {
-        this.metricRecorder = metricRecorder;
-    }
-
-    @Override
-    public void startRecording(Method method) throws Exception {
-        startExecution = Instant.now();
-    }
-
-    @Override
-    public void finishRecording(Method method, String selectorName, String implementation) throws Exception {
-        Duration duration = Duration.between(startExecution, Instant.now());
-        String result;
-        if(implementation.equals("Implementation1")){
-            averageExecutionImpl1.add(duration.toMillis() / 1000.0d);
-            result = averageExecutionTime(averageExecutionImpl1)+"" ;
-        }else {
-            averageExecutionImpl2.add(duration.toMillis() / 1000.0d);
-            result = averageExecutionTime(averageExecutionImpl2)+"" ;
-        }
-
-        MetricResult mr = extractMetricResult(method, selectorName, implementation, result);
-        metricRecorder.save(mr);
-    }
-}
-```
-
-In this example AverageExecutionTime is based on the predefined TimeMetricsGenerator class. Instead of collecting the execution time of each run we collect the average execution time. We realized this using 2 different lists, we use to store the execution times of the different implementations. The MetricsRecorder will then receive the calculated average execution time of the corresponding implementation. 
 
 #### Last step: 
 **Create the factory method responsible to instantiate the proxy that performs the A/B tests.**
@@ -166,16 +101,16 @@ reference to the framework. When the A/B test is not needed anymore, only the fa
 **The collected average execution times of the different implementations are visible in the MetricResult when executing the A/B test.**
 
 ```
+* Implementation 1 was selected
+2022-05-14 18:45:12 - MetricResult{metric=TimeMetrics, selector=SelectorRandom, implementation=Implementation1, method=printSomething, result=0.252 seconds}
 ** Implementation 2 was selected
-2022-05-08 22:08:52 - MetricResult{metric=AverageExecutionTime, selector=SelectorRandom, implementation=Implementation2, method=printSomething, result=0.498}
+2022-05-14 18:45:12 - MetricResult{metric=TimeMetrics, selector=SelectorRandom, implementation=Implementation2, method=printSomething, result=0.433 seconds}
 * Implementation 1 was selected
-2022-05-08 22:08:53 - MetricResult{metric=AverageExecutionTime, selector=SelectorRandom, implementation=Implementation1, method=printSomething, result=0.295}
+2022-05-14 18:45:12 - MetricResult{metric=TimeMetrics, selector=SelectorRandom, implementation=Implementation1, method=printSomething, result=0.295 seconds}
 * Implementation 1 was selected
-2022-05-08 22:08:53 - MetricResult{metric=AverageExecutionTime, selector=SelectorRandom, implementation=Implementation1, method=printSomething, result=0.2955}
-* Implementation 1 was selected
-2022-05-08 22:08:53 - MetricResult{metric=AverageExecutionTime, selector=SelectorRandom, implementation=Implementation1, method=printSomething, result=0.2776666666666667}
+2022-05-14 18:45:13 - MetricResult{metric=TimeMetrics, selector=SelectorRandom, implementation=Implementation1, method=printSomething, result=0.213 seconds}
 ** Implementation 2 was selected
-2022-05-08 22:08:54 - MetricResult{metric=AverageExecutionTime, selector=SelectorRandom, implementation=Implementation2, method=printSomething, result=0.4505}
+2022-05-14 18:45:13 - MetricResult{metric=TimeMetrics, selector=SelectorRandom, implementation=Implementation2, method=printSomething, result=0.465 seconds}
 ```
 
 
