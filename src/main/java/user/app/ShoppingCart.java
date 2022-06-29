@@ -18,7 +18,7 @@ public class ShoppingCart implements PlaceOrder {
     @Override
     public void placeOrder(int orderID, Item item, User user) {
        if(user.getBalance()>= totalCost){
-
+           System.out.println("order sent!");
        }
     }
 
