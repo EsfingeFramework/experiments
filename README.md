@@ -215,7 +215,44 @@ In this example we collect the orderValue metrics by simply passing the first ar
 
 **Extending the MetricRecorder hotspot to store the metrics into a database.**
 
-//wagner case study in the paper - example required
+*The class ExperimentRepository and ExperimentRecorder will be created*
+
+```
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ExperimentRepository extends JpaRepository<ExperimentInformation, Long> {
+}
+```
+
+The class ExperimentRepository extends the springframwork class JpaRepsitory that will serve us the database for this example.
+
+```
+public class ExperimentRecorder implements MetricRecorder {
+
+    private final ExperimentRepository experimentRepository;
+
+    public ExperimentRecorder(final ExperimentRepository experimentRepository) {
+        this.experimentRepository = experimentRepository;
+    }
+
+    @Override
+    public void save(final MetricResult metricResult) {
+        experimentRepository.save(ExperimentInformation.builder()
+                .metric(metricResult.getMetric())
+                .selector(metricResult.getSelector())
+                .implementation(metricResult.getImplementation())
+                .method(metricResult.getMethod())
+                .result(metricResult.getResult().split(" ")[0])
+                .build());
+    }
+}
+```
+
+We create the class ExperimentRecorder and implement the hotspot MetricsRecorder.
+In order to store the metrics inside the database we override the save method from the MetricRecorder and we use a seperate class ExperimentInformation that is responsible to collect all the information we want to
+store in the database. To store the information we call save() from the ExperimentRepository class to persist the data.
 
 ### Selector
 
