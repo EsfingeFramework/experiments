@@ -26,10 +26,10 @@ Besides the proxy creation, no further reference for the A/B tests is needed nei
 This is a graphical representation of the model. The fire icon marked elements represent
 hot-spots, the ones that the framework should model as extension points.
 
-The entry point for the framework is the AB Test Proxy, which should implement the same interface of the alternative implementations. The component uses instances from **Metrics** and  **Metrics Recorder** that are framework hot-spots. 
+The entry point for the framework is the AB Test Proxy, which should implement the same interface of the alternative implementations. The component uses instances from **MetricsCollector** and  **MetricsRecorder** that are framework hot-spots. 
 
-- **Metrics** can be extended to implement new measurements.
-- **Metrics Recorder** allows the application to store this data using its preferred approach, like on its database or exporting the data to another tool. 
+- **MetricsCollector** can be extended to implement new measurements.
+- **MetricsRecorder** allows the application to store this data using its preferred approach, like on its database or exporting the data to another tool. 
 - **Selector** is responsible for implementing the approach used to choose between the alternative implementations, being extensible to allow domain-specific criteria to be used.
 
 The framework model defines the definition of measurements to be collected in the A/B tests through metadata (measurements like execution time or memory usage).
@@ -39,7 +39,7 @@ The framework provides an extension point to allow the implementation of new met
 ### Simple Example
 
 #### Scenario:
-**Two different implementations of printing to the console, where each implementation requires a different amount of time to finish execution.**
+**Two different implementations of hash generation, where each implementation requires a different amount of time to create the hash.**
 
 #### First step:
 **Define an interface to abstract the interaction with the alternative implementations.**
@@ -49,12 +49,12 @@ The interface ImplementationInterface will be created.
 ```
 @AverageExecutionTime
 public interface ImplementationInterface {
-    void printSomething();
+    void calculateHash(); //method we want to test between implementations
 }
 ```
 
-The interface abstracts the behavior for our implementations that will print on the console. The interface receives annotations to configure the metrics, in this case @TimeMetrics will collect the execution time measurement for each implementation. 
-(@TimeMetrics is a predefiend extension-point of the Metrics hotspot)
+The interface abstracts the behavior for our implementations that will create the hash. The interface receives annotations to configure the metrics, in this case @TimeMetrics will collect the execution time measurement for each implementation. 
+(@TimeMetrics is a predefiend extension-point of the MetricsCollector hotspot)
 
 
 #### Last step: 
@@ -65,9 +65,9 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        ImplementationInterface menuOrg = (ImplementationInterface) createOrganizer();
+        ImplementationInterface tests = (ImplementationInterface) createOrganizer();
         for (int i=0 ; i<20; i++){
-            menuOrg.printSomething();
+            tests.calculateHash();
         }
 
     }
@@ -77,8 +77,8 @@ public class Main {
                 = new ABTestBuilder<ImplementationInterface, Integer>();
 
         Class[] classes = new Class[2];
-        classes[0]= Implementation1.class;
-        classes[1]= Implementation2.class;
+        classes[0]= md5Hash.class;
+        classes[1]= shaHash.class;
 
         ABTest abTest = abTestBuilder.
                 createFor(ImplementationInterface.class).
@@ -102,15 +102,15 @@ reference to the framework. When the A/B test is not needed anymore, only the fa
 
 ```
 * Implementation 1 was selected
-2022-05-14 18:45:12 - MetricResult{metric=TimeMetrics, selector=SelectorRandom, implementation=Implementation1, method=printSomething, result=0.252 seconds}
+2022-05-14 18:45:12 - MetricResult{metric=TimeMetrics, selector=SelectorRandom, implementation=md5Hash, method=calculateHash, result=0.252 seconds}
 ** Implementation 2 was selected
-2022-05-14 18:45:12 - MetricResult{metric=TimeMetrics, selector=SelectorRandom, implementation=Implementation2, method=printSomething, result=0.433 seconds}
+2022-05-14 18:45:12 - MetricResult{metric=TimeMetrics, selector=SelectorRandom, implementation=shaHash, method=calculateHash, result=0.433 seconds}
 * Implementation 1 was selected
-2022-05-14 18:45:12 - MetricResult{metric=TimeMetrics, selector=SelectorRandom, implementation=Implementation1, method=printSomething, result=0.295 seconds}
+2022-05-14 18:45:12 - MetricResult{metric=TimeMetrics, selector=SelectorRandom, implementation=md5Hash, method=calculateHash, result=0.295 seconds}
 * Implementation 1 was selected
-2022-05-14 18:45:13 - MetricResult{metric=TimeMetrics, selector=SelectorRandom, implementation=Implementation1, method=printSomething, result=0.213 seconds}
+2022-05-14 18:45:13 - MetricResult{metric=TimeMetrics, selector=SelectorRandom, implementation=md5Hash, method=calculateHash, result=0.213 seconds}
 ** Implementation 2 was selected
-2022-05-14 18:45:13 - MetricResult{metric=TimeMetrics, selector=SelectorRandom, implementation=Implementation2, method=printSomething, result=0.465 seconds}
+2022-05-14 18:45:13 - MetricResult{metric=TimeMetrics, selector=SelectorRandom, implementation=shaHash, method=calculateHash, result=0.465 seconds}
 ```
 
 
@@ -139,16 +139,184 @@ Below, the description of the main classes/interfaces from the framework structu
 - **MetricRecorder** is an interface providing a method
   for handling the metric values collected by implementations of a MetricsGenerator. Usually, implementations of this class store the metric values to be used
   for analysis later. 
-- **Metrics** is an interface for classes that capture metrics and @MetricsGenerator is an annotation to
-  associate an annotation to the metric implementation.
+- **MetricsCollector** is an interface for classes that capture metrics and @MetricsGenerator is an annotation to
+  specify the metric implementation.
   This annotation is currently used by the @MemoryMetrics
-  and @PerformanceMetrics annotations which respectively indicate the MemoryMetricsGenerator
-  and PerformanceMetricsGenerator classes. The
+  and @TimeMetrics annotations which respectively indicate the MemoryMetricsGenerator
+  and TimeMetricsGenerator classes. The
   class MetricResult represents in a general way the
   collected value for a metric. It can be specialized to store
   more specific information
   Example for the metrics extension point
 
 
+### Extension of hotspots examples
 
 
+### MetricsCollector
+
+**Extending the MetricsCollector hotspot to collect the value of an order in the method parameters.**
+**(method of an order where one parameter represents the orderID of the order)**
+
+*The Annotation OrderValue and the class OrderValueMetricsGenerator will be created*
+
+```
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@MetricsGenerator(OrderValueMetricsGenerator.class)
+public @interface OrderValue {
+}
+```
+
+@OrderValue is an annotation that uses @MetricsGenerator to specify the class that implements the collection of the metrics.
+OrderValueMetricsGenerator is the class we have to create and contains the logic to capture metrics.
+
+```
+public class OrderValueMetricsGenerator extends BaseAroundMetricsCollector {
+    
+    public OrderValueMetricsGenerator(MetricsCollector next) {
+        super(next);
+    }
+
+    @Override
+    public void collectException(Class selectedImplementation, Selector selector, Method method, Object[] args, Throwable targetException) throws Throwable {
+        MetricResult metricResult = extractMetricResult(method,selector.getClass().getSimpleName(),selectedImplementation.getSimpleName(),targetException.getMessage());
+        getMetricRecorder().save(metricResult);
+    }
+
+    @Override
+    public void collectAfter(Class selectedImplementation, Selector selector, Method method, Object[] args, Object returned) throws Throwable {
+
+    }
+
+    @Override
+    public void collectBefore(Class selectedImplementation, Selector selector, Method method, Object[] args) throws Throwable {
+        Integer result = (Integer) args[0];
+        MetricResult metricResult = extractMetricResult(method,selector.getClass().getSimpleName(),selectedImplementation.getSimpleName(),result.toString());
+        getMetricRecorder().save(metricResult);
+    }
+}
+```
+
+The class OrderValueMetricsGenerator extends BaseAroundMetricsCollector which is used for the chain of responsability of the MetricsColletor hotspot.
+To collect the wanted metrics we have to implement all of the abstract methods of the super class:
+
+- collectBefore -> collects metrics before the invokation of the method
+- collectAfter -> collects the metrics after the invokation of the method
+- collectException -> collects the metrics if any exception was thrown during the invokation of the method
+
+Inside the extended methods we create a MetricsResult that we fill with the method extractMetricResult which is extended by the BaseAroundMetricsCollector and will generate
+a MetricsResult with the provided information: method, selector, selectedImplementation and result.
+After creating the MetricResult we use the MetricsRecorder from BaseAroundMetricsCollector with the function getMetricRecorder and save the metricsResult inside of it.
+
+In this example we collect the orderValue metrics by simply passing the first argument (orderID) of the invokation to the MetricRecorder.
+
+### MetricRecorder
+
+**Extending the MetricRecorder hotspot to store the metrics into a database.**
+
+*The class ExperimentRepository and ExperimentRecorder will be created*
+
+```
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ExperimentRepository extends JpaRepository<ExperimentInformation, Long> {
+}
+```
+
+The class ExperimentRepository extends the springframwork class JpaRepsitory that will serve us the database for this example.
+
+```
+public class ExperimentRecorder implements MetricRecorder {
+
+    private final ExperimentRepository experimentRepository;
+
+    public ExperimentRecorder(final ExperimentRepository experimentRepository) {
+        this.experimentRepository = experimentRepository;
+    }
+
+    @Override
+    public void save(final MetricResult metricResult) {
+        experimentRepository.save(ExperimentInformation.builder()
+                .metric(metricResult.getMetric())
+                .selector(metricResult.getSelector())
+                .implementation(metricResult.getImplementation())
+                .method(metricResult.getMethod())
+                .result(metricResult.getResult().split(" ")[0])
+                .build());
+    }
+}
+```
+
+We create the class ExperimentRecorder and implement the hotspot MetricsRecorder.
+In order to store the metrics inside the database we override the save method from the MetricRecorder and we use a seperate class ExperimentInformation that is responsible to collect all the information we want to
+store in the database. To store the information we call save() from the ExperimentRepository class to persist the data.
+
+### Selector
+
+**Extending the Selector hotspot that uses information about the method parameters to select a specific implementation for the AB-test**
+**(for example - implementation B will only be selected if one of the parameters contains the company: *company-B*)**
+
+*The Annotation targetParameter and the class CompanySelector will be created*
+
+```
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.PARAMETER)
+public @interface targetParameter {
+}
+```
+
+```
+@OrderValue
+public interface ImplementationInterface {
+    void placeOrder(int orderID, Item item , @targetParameter User user);
+}
+```
+
+We use the targetParameter annotation to specify in the implementations which of the parameters will contain the information about the company.
+The company information is used to select specific implementations for specific companies:
+
+```
+public class CompanySelector implements Selector {
+    @Override
+    public Class select(Class[] implementations, Object[] args,Method m) {
+
+        Parameter[] parameters = m.getParameters();
+        int targetParameterPosition=0 ;
+        for(int i =0; i< parameters.length; i++){
+            if (parameters[i].isAnnotationPresent(targetParameter.class)){
+                targetParameterPosition= i;
+            }
+        }
+
+        if(((User) args[targetParameterPosition]).getCompanyName().equals("Loacker")){
+            return implementations[0];
+            //for the company Loacker only the first implementation will be selected
+        }else{
+            return new SelectorRandom().select(implementations,args,m);
+        }
+    }
+}
+```
+
+Here the extension CompanySelector is created that uses metadata to find the parameter with the **targetParameter** annotation.
+From the targetParameter we extract the company information and for the company ***Loacker*** we specifically only select the first implementation for the AB-Tests.
+
+Bellow a snippet of the results when we run the Framework with this new Selector:
+
+```
+* Implementation 1 was selected with user working in company: Loacker
+2022-05-24 22:01:35 - MetricResult{metric=OrderValueMetrics, selector=CompanySelector, implementation=Implementation1, method=placeOrder, result=194}
+* Implementation 1 was selected with user working in company: Loacker
+2022-05-24 22:01:35 - MetricResult{metric=OrderValueMetrics, selector=CompanySelector, implementation=Implementation1, method=placeOrder, result=109}
+* Implementation 1 was selected with user working in company: Facebook
+2022-05-24 22:01:35 - MetricResult{metric=OrderValueMetrics, selector=CompanySelector, implementation=Implementation2, method=placeOrder, result=102}
+* Implementation 1 was selected with user working in company: Loacker
+2022-05-24 22:01:35 - MetricResult{metric=OrderValueMetrics, selector=CompanySelector, implementation=Implementation1, method=placeOrder, result=81}
+* Implementation 1 was selected with user working in company: McDonalds
+2022-05-24 22:01:36 - MetricResult{metric=OrderValueMetrics, selector=CompanySelector, implementation=Implementation1, method=placeOrder, result=146}
+* Implementation 1 was selected with user working in company: McDonalds
+2022-05-24 22:01:36 - MetricResult{metric=OrderValueMetrics, selector=CompanySelector, implementation=Implementation2, method=placeOrder, result=140}
+```
