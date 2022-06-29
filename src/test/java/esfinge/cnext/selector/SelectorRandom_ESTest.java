@@ -23,7 +23,7 @@ public class SelectorRandom_ESTest extends SelectorRandom_ESTest_scaffolding {
       SelectorRandom selectorRandom0 = new SelectorRandom();
       Class<Integer>[] classArray0 = (Class<Integer>[]) Array.newInstance(Class.class, 3);
       Random.setNextRandom((-154));
-      Class class0 = selectorRandom0.select(classArray0);
+      Class class0 = selectorRandom0.select(classArray0,null,null);
       assertNull(class0);
   }
 
@@ -33,7 +33,7 @@ public class SelectorRandom_ESTest extends SelectorRandom_ESTest_scaffolding {
       Class<Integer>[] classArray0 = (Class<Integer>[]) Array.newInstance(Class.class, 3);
       Class<Integer> class0 = Integer.class;
       classArray0[0] = class0;
-      Class class1 = selectorRandom0.select(classArray0);
+      Class class1 = selectorRandom0.select(classArray0,null,null);
       assertFalse(class1.isArray());
   }
 
@@ -41,8 +41,8 @@ public class SelectorRandom_ESTest extends SelectorRandom_ESTest_scaffolding {
   public void test2()  throws Throwable  {
       SelectorRandom selectorRandom0 = new SelectorRandom();
       // Undeclared exception!
-      try { 
-        selectorRandom0.select((Class[]) null);
+      try {
+        selectorRandom0.select((Class[]) null,null,null);
         fail("Expecting exception: NullPointerException");
       
       } catch(NullPointerException e) {
@@ -58,8 +58,8 @@ public class SelectorRandom_ESTest extends SelectorRandom_ESTest_scaffolding {
       SelectorRandom selectorRandom0 = new SelectorRandom();
       Class<Object>[] classArray0 = (Class<Object>[]) Array.newInstance(Class.class, 0);
       // Undeclared exception!
-      try { 
-        selectorRandom0.select(classArray0);
+      try {
+        selectorRandom0.select(classArray0,null,null);
         fail("Expecting exception: ArithmeticException");
       
       } catch(ArithmeticException e) {

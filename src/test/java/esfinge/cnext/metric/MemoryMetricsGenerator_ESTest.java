@@ -20,24 +20,16 @@ public class MemoryMetricsGenerator_ESTest extends MemoryMetricsGenerator_ESTest
 
   @Test(timeout = 4000)
   public void test0()  throws Throwable  {
-      MemoryMetricsGenerator memoryMetricsGenerator0 = new MemoryMetricsGenerator();
+      MemoryMetricsGenerator memoryMetricsGenerator0 = new MemoryMetricsGenerator(null);
       MetricRecorder metricRecorder0 = memoryMetricsGenerator0.getMetricRecorder();
       assertNull(metricRecorder0);
       
-      memoryMetricsGenerator0.setMetricRecorder((MetricRecorder) null);
-      memoryMetricsGenerator0.setMetricRecorder((MetricRecorder) null);
-      memoryMetricsGenerator0.getMetricRecorder();
-      memoryMetricsGenerator0.setMetricRecorder((MetricRecorder) null);
-      memoryMetricsGenerator0.getMetricRecorder();
-      memoryMetricsGenerator0.getMetricRecorder();
-      memoryMetricsGenerator0.getMetricRecorder();
-      Method method0 = null;
-      memoryMetricsGenerator0.startRecording(method0);
+
   }
 
   @Test(timeout = 4000)
   public void test1()  throws Throwable  {
-      MemoryMetricsGenerator memoryMetricsGenerator0 = new MemoryMetricsGenerator();
+      MemoryMetricsGenerator memoryMetricsGenerator0 = new MemoryMetricsGenerator(null);
       MetricRecorderFile metricRecorderFile0 = new MetricRecorderFile("PR>F");
       MetricResult metricResult0 = new MetricResult("PR>F", "PR>F", "esfinge.cnext.metric.MetricResult", "", "esfinge.cnext.metric.MetricRecorderLogger");
       metricRecorderFile0.save(metricResult0);
@@ -52,7 +44,7 @@ public class MemoryMetricsGenerator_ESTest extends MemoryMetricsGenerator_ESTest
 
   @Test(timeout = 4000)
   public void test2()  throws Throwable  {
-      MemoryMetricsGenerator memoryMetricsGenerator0 = new MemoryMetricsGenerator();
+      MemoryMetricsGenerator memoryMetricsGenerator0 = new MemoryMetricsGenerator(null);
       MetricRecorderLogger metricRecorderLogger0 = new MetricRecorderLogger();
       memoryMetricsGenerator0.setMetricRecorder(metricRecorderLogger0);
   }

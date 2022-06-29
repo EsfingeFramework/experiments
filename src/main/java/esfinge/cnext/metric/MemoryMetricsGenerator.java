@@ -1,7 +1,8 @@
 package esfinge.cnext.metric;
 
-import esfinge.cnext.factories.MetricRecorder;
-import esfinge.cnext.factories.Metrics;
+import esfinge.cnext.factories.Selector;
+import esfinge.cnext.metricscolector.BaseAroundMetricsCollector;
+import esfinge.cnext.metricscolector.MetricsCollector;
 
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
@@ -9,32 +10,22 @@ import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class MemoryMetricsGenerator implements Metrics {
+public class MemoryMetricsGenerator extends BaseAroundMetricsCollector {
 
-    private MetricRecorder metricRecorder;
     private long usedMemoryBefore;
 
-    @Override
-    public MetricRecorder getMetricRecorder() {
-        return metricRecorder;
+    public MemoryMetricsGenerator(MetricsCollector next) {
+        super(next);
     }
 
     @Override
-    public void setMetricRecorder(MetricRecorder metricRecorder) {
-        this.metricRecorder = metricRecorder;
+    public void collectException(Class selectedImplementation, Selector selector, Method method, Object[] args, Throwable targetException) throws Throwable {
+        MetricResult mr = extractMetricResult(method, selector.getClass().getSimpleName(), selectedImplementation.getSimpleName(),targetException.getMessage());
+        getMetricRecorder().save(mr);
     }
 
     @Override
-    public void startRecording(Method method) throws Exception {
-        try {
-            usedMemoryBefore = getSettledUsedMemory();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    @Override
-    public void finishRecording(Method method, String selectorName, String implementation) throws Exception {
+    public void collectAfter(Class selectedImplementation, Selector selector, Method method, Object[] args, Object returned) throws Throwable {
         long usedMemoryAfter = 0;
         try {
             usedMemoryAfter = getSettledUsedMemory();
@@ -42,9 +33,20 @@ public class MemoryMetricsGenerator implements Metrics {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
         String result = usedMemoryAfter - usedMemoryBefore + " bytes";
-        MetricResult mr = extractMetricResult(method, selectorName, implementation, result);
-        metricRecorder.save(mr);
+        MetricResult mr = extractMetricResult(method, selector.getClass().getSimpleName(), selectedImplementation.getSimpleName(),result);
+        getMetricRecorder().save(mr);
     }
+
+    @Override
+    public void collectBefore(Class selectedImplementation, Selector selector, Method method, Object[] args) throws Throwable {
+        try {
+            usedMemoryBefore = getSettledUsedMemory();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+
 
     private long getGcCount() {
         long sum = 0;

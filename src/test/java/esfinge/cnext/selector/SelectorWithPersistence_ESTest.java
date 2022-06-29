@@ -26,8 +26,8 @@ public class SelectorWithPersistence_ESTest extends SelectorWithPersistence_ESTe
       SelectorWithPersistence selectorWithPersistence0 = new SelectorWithPersistence("SI2g", selectorRandom0);
       Class<Object>[] classArray0 = (Class<Object>[]) Array.newInstance(Class.class, 4);
       // Undeclared exception!
-      try { 
-        selectorWithPersistence0.select(classArray0);
+      try {
+        selectorWithPersistence0.select(classArray0,null,null);
         fail("Expecting exception: NullPointerException");
       
       } catch(NullPointerException e) {
@@ -45,8 +45,8 @@ public class SelectorWithPersistence_ESTest extends SelectorWithPersistence_ESTe
       FileSystemHandling.shouldAllThrowIOExceptions();
       Class<JSONArray> class0 = JSONArray.class;
       classArray0[0] = class0;
-      Class class1 = selectorWithPersistence0.select(classArray0);
-      Class class2 = selectorWithPersistence0.select(classArray0);
+      Class class1 = selectorWithPersistence0.select(classArray0,null,null);
+      Class class2 = selectorWithPersistence0.select(classArray0,null,null);
       assertSame(class2, class1);
   }
 
@@ -56,8 +56,8 @@ public class SelectorWithPersistence_ESTest extends SelectorWithPersistence_ESTe
       Class<JSONArray>[] classArray0 = (Class<JSONArray>[]) Array.newInstance(Class.class, 1);
       Class<JSONArray> class0 = JSONArray.class;
       classArray0[0] = class0;
-      selectorWithPersistence0.select(classArray0);
-      Class class1 = selectorWithPersistence0.select(classArray0);
+      selectorWithPersistence0.select(classArray0,null,null);
+      Class class1 = selectorWithPersistence0.select(classArray0,null,null);
       assertFalse(class1.isEnum());
   }
 
@@ -80,8 +80,8 @@ public class SelectorWithPersistence_ESTest extends SelectorWithPersistence_ESTe
       SelectorWithPersistence selectorWithPersistence0 = new SelectorWithPersistence("=Y0g1");
       Class<Integer>[] classArray0 = (Class<Integer>[]) Array.newInstance(Class.class, 0);
       // Undeclared exception!
-      try { 
-        selectorWithPersistence0.select(classArray0);
+      try {
+        selectorWithPersistence0.select(classArray0,null,null);
         fail("Expecting exception: ArithmeticException");
       
       } catch(ArithmeticException e) {

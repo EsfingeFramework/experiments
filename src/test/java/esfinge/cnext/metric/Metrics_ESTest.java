@@ -5,6 +5,7 @@
 
 package esfinge.cnext.metric;
 
+import esfinge.cnext.factories.Selector;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.evosuite.runtime.EvoAssertions.*;
@@ -21,9 +22,9 @@ public class Metrics_ESTest extends Metrics_ESTest_scaffolding {
 
   @Test(timeout = 4000)
   public void test0()  throws Throwable  {
-      MemoryMetricsGenerator memoryMetricsGenerator0 = new MemoryMetricsGenerator();
+      MemoryMetricsGenerator memoryMetricsGenerator0 = new MemoryMetricsGenerator(null);
       try { 
-        memoryMetricsGenerator0.finishRecording((Method) null, "bk3Jy,I,PSY4@mm", " seconds");
+        memoryMetricsGenerator0.collectAfter(Object.class, (Selector) null,(Method)null,(Object[])null,(Object)null);
         fail("Expecting exception: NullPointerException");
       
       } catch(NullPointerException e) {
@@ -36,27 +37,27 @@ public class Metrics_ESTest extends Metrics_ESTest_scaffolding {
 
   @Test(timeout = 4000)
   public void test1()  throws Throwable  {
-      MemoryMetricsGenerator memoryMetricsGenerator0 = new MemoryMetricsGenerator();
-      memoryMetricsGenerator0.startRecording((Method) null);
+      MemoryMetricsGenerator memoryMetricsGenerator0 = new MemoryMetricsGenerator(null);
+      memoryMetricsGenerator0.collectBefore((Class)null,(Selector) null,(Method) null, (Object[])null);
   }
 
   @Test(timeout = 4000)
   public void test2()  throws Throwable  {
-      TimeMetricsGenerator timeMetricsGenerator0 = new TimeMetricsGenerator();
+      TimeMetricsGenerator timeMetricsGenerator0 = new TimeMetricsGenerator(null);
       MetricRecorderLogger metricRecorderLogger0 = new MetricRecorderLogger();
       timeMetricsGenerator0.setMetricRecorder(metricRecorderLogger0);
   }
 
   @Test(timeout = 4000)
   public void test3()  throws Throwable  {
-      TimeMetricsGenerator timeMetricsGenerator0 = new TimeMetricsGenerator();
+      TimeMetricsGenerator timeMetricsGenerator0 = new TimeMetricsGenerator(null);
       MetricRecorder metricRecorder0 = timeMetricsGenerator0.getMetricRecorder();
       assertNull(metricRecorder0);
   }
 
   @Test(timeout = 4000)
   public void test4()  throws Throwable  {
-      TimeMetricsGenerator timeMetricsGenerator0 = new TimeMetricsGenerator();
+      TimeMetricsGenerator timeMetricsGenerator0 = new TimeMetricsGenerator(null);
       MetricRecorderFile metricRecorderFile0 = new MetricRecorderFile("");
       timeMetricsGenerator0.setMetricRecorder(metricRecorderFile0);
       MetricRecorder metricRecorder0 = timeMetricsGenerator0.getMetricRecorder();
@@ -65,7 +66,7 @@ public class Metrics_ESTest extends Metrics_ESTest_scaffolding {
 
   @Test(timeout = 4000)
   public void test5()  throws Throwable  {
-      TimeMetricsGenerator timeMetricsGenerator0 = new TimeMetricsGenerator();
+      TimeMetricsGenerator timeMetricsGenerator0 = new TimeMetricsGenerator(null);
       // Undeclared exception!
       try { 
         timeMetricsGenerator0.extractMetricResult((Method) null, "", "", "");
@@ -81,9 +82,9 @@ public class Metrics_ESTest extends Metrics_ESTest_scaffolding {
 
   @Test(timeout = 4000)
   public void test6()  throws Throwable  {
-      MemoryMetricsGenerator memoryMetricsGenerator0 = new MemoryMetricsGenerator();
+      MemoryMetricsGenerator memoryMetricsGenerator0 = new MemoryMetricsGenerator(null);
       try { 
-        memoryMetricsGenerator0.finishRecording((Method) null, "V$x", "V$x");
+        memoryMetricsGenerator0.collectAfter((Class)null,(Selector) null,(Method) null, (Object[])null,(Object) null);
         fail("Expecting exception: NullPointerException");
       
       } catch(NullPointerException e) {

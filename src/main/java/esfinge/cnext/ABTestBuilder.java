@@ -5,8 +5,11 @@ import esfinge.cnext.metric.MetricRecorderLogger;
 import esfinge.cnext.factories.Metrics;
 import esfinge.cnext.annotations.MetricsGenerator;
 import esfinge.cnext.factories.Selector;
+import esfinge.cnext.metricscolector.FinalCollector;
+import esfinge.cnext.metricscolector.MetricsCollector;
 import esfinge.cnext.selector.SelectorRandom;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,18 +57,20 @@ public class ABTestBuilder<T, R> {
 
         ABTestProxy<R> proxy = new ABTestProxy();
 
-        List<Metrics> metrics = new ArrayList<>();
+        MetricsCollector collectorChain = new FinalCollector();
+        collectorChain.setMetricRecorder(metricRecorder);
         for (Annotation an : proxyClass.getAnnotations()) {
             Class<?> anType = an.annotationType();
             if (anType.isAnnotationPresent(MetricsGenerator.class)) {
                 MetricsGenerator fi = anType.getAnnotation(MetricsGenerator.class);
-                Class<? extends Metrics> c = fi.value();
-                Metrics metric = c.newInstance();
-                metric.setMetricRecorder(metricRecorder);
-                metrics.add(metric);
+                Class<? extends MetricsCollector> c = fi.value();
+                Constructor<? extends MetricsCollector> constr = c.getConstructor(MetricsCollector.class);
+                MetricsCollector metricCollector = constr.newInstance(collectorChain);
+                metricCollector.setMetricRecorder(metricRecorder);
+                collectorChain = metricCollector;
             }
         }
-        proxy.setMetrics(metrics);
+        proxy.setMetricsCollectorChain(collectorChain);
         proxy.setSelector(selector);
         proxy.setImplementations(implementations);
 

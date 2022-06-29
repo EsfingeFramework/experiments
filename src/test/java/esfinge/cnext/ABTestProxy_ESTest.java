@@ -5,12 +5,13 @@
 
 package esfinge.cnext;
 
+import esfinge.cnext.factories.Metrics;
+import esfinge.cnext.metricscolector.MetricsCollector;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.evosuite.runtime.EvoAssertions.*;
 
 import esfinge.cnext.metric.MemoryMetricsGenerator;
-import esfinge.cnext.factories.Metrics;
 import esfinge.cnext.metric.TimeMetricsGenerator;
 import esfinge.cnext.factories.Selector;
 import esfinge.cnext.selector.SelectorWithPersistence;
@@ -18,6 +19,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
@@ -37,21 +39,21 @@ public class ABTestProxy_ESTest extends ABTestProxy_ESTest_scaffolding {
   @Test(timeout = 4000)
   public void test01()  throws Throwable  {
       ABTestProxy<Object> aBTestProxy0 = new ABTestProxy<Object>();
-      LinkedList<Metrics> linkedList0 = new LinkedList<Metrics>();
-      aBTestProxy0.setMetrics(linkedList0);
-      List<Metrics> list0 = aBTestProxy0.getMetrics();
-      assertTrue(list0.isEmpty());
+
+      aBTestProxy0.setMetricsCollectorChain(null);
+      MetricsCollector list0 = aBTestProxy0.getMetricsCollectorChain();
+      assertNull(list0);
   }
 
   @Test(timeout = 4000)
   public void test02()  throws Throwable  {
       ABTestProxy<Object> aBTestProxy0 = new ABTestProxy<Object>();
-      LinkedList<Metrics> linkedList0 = new LinkedList<Metrics>();
-      TimeMetricsGenerator timeMetricsGenerator0 = new TimeMetricsGenerator();
-      linkedList0.offerFirst(timeMetricsGenerator0);
-      aBTestProxy0.setMetrics(linkedList0);
-      List<Metrics> list0 = aBTestProxy0.getMetrics();
-      assertFalse(list0.isEmpty());
+
+      TimeMetricsGenerator timeMetricsGenerator0 = new TimeMetricsGenerator(null);
+
+      aBTestProxy0.setMetricsCollectorChain(timeMetricsGenerator0);
+      MetricsCollector coll = aBTestProxy0.getMetricsCollectorChain();
+      assertNotNull(coll);
   }
 
   @Test(timeout = 4000)
@@ -79,7 +81,7 @@ public class ABTestProxy_ESTest extends ABTestProxy_ESTest_scaffolding {
       Class<Integer>[] classArray1 = (Class<Integer>[]) Array.newInstance(Class.class, 5);
       Class<Integer> class0 = Integer.class;
       classArray1[0] = class0;
-      selectorWithPersistence0.select(classArray1);
+      selectorWithPersistence0.select(classArray1,null,null);
       ABTestProxy<MemoryMetricsGenerator> aBTestProxy0 = new ABTestProxy<MemoryMetricsGenerator>();
       aBTestProxy0.setSelector(selectorWithPersistence0);
       try { 
@@ -95,7 +97,7 @@ public class ABTestProxy_ESTest extends ABTestProxy_ESTest_scaffolding {
       ABTestProxy<MemoryMetricsGenerator> aBTestProxy0 = new ABTestProxy<MemoryMetricsGenerator>();
       Class<String>[] classArray0 = (Class<String>[]) Array.newInstance(Class.class, 0);
       aBTestProxy0.setImplementations(classArray0);
-      MemoryMetricsGenerator memoryMetricsGenerator0 = new MemoryMetricsGenerator();
+      MemoryMetricsGenerator memoryMetricsGenerator0 = new MemoryMetricsGenerator(null);
       SelectorWithPersistence selectorWithPersistence0 = new SelectorWithPersistence("!(ER:h1f");
       aBTestProxy0.setSelector(selectorWithPersistence0);
       Object[] objectArray0 = new Object[3];
@@ -114,15 +116,15 @@ public class ABTestProxy_ESTest extends ABTestProxy_ESTest_scaffolding {
   @Test(timeout = 4000)
   public void test07()  throws Throwable  {
       ABTestProxy<MemoryMetricsGenerator> aBTestProxy0 = new ABTestProxy<MemoryMetricsGenerator>();
-      MemoryMetricsGenerator memoryMetricsGenerator0 = new MemoryMetricsGenerator();
+      MemoryMetricsGenerator memoryMetricsGenerator0 = new MemoryMetricsGenerator(null);
       SelectorWithPersistence selectorWithPersistence0 = new SelectorWithPersistence();
       Class<TimeMetricsGenerator>[] classArray0 = (Class<TimeMetricsGenerator>[]) Array.newInstance(Class.class, 4);
       Class<TimeMetricsGenerator> class0 = TimeMetricsGenerator.class;
       classArray0[0] = class0;
-      LinkedList<Metrics> linkedList0 = new LinkedList<Metrics>();
-      linkedList0.add((Metrics) memoryMetricsGenerator0);
-      aBTestProxy0.setMetrics(linkedList0);
-      selectorWithPersistence0.select(classArray0);
+      TimeMetricsGenerator linkedList0 = new TimeMetricsGenerator(null);
+
+      aBTestProxy0.setMetricsCollectorChain(linkedList0);
+      selectorWithPersistence0.select(classArray0,null,null);
       aBTestProxy0.setSelector(selectorWithPersistence0);
       try { 
         aBTestProxy0.invoke(memoryMetricsGenerator0, (Method) null, classArray0);
@@ -146,7 +148,7 @@ public class ABTestProxy_ESTest extends ABTestProxy_ESTest_scaffolding {
   @Test(timeout = 4000)
   public void test09()  throws Throwable  {
       ABTestProxy<Object> aBTestProxy0 = new ABTestProxy<Object>();
-      List<Metrics> list0 = aBTestProxy0.getMetrics();
+      MetricsCollector list0 = aBTestProxy0.getMetricsCollectorChain();
       assertNull(list0);
   }
 

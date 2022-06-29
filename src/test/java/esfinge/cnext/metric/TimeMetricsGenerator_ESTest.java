@@ -5,6 +5,7 @@
 
 package esfinge.cnext.metric;
 
+import esfinge.cnext.factories.Selector;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.evosuite.runtime.EvoAssertions.*;
@@ -21,11 +22,11 @@ public class TimeMetricsGenerator_ESTest extends TimeMetricsGenerator_ESTest_sca
 
   @Test(timeout = 4000)
   public void test0()  throws Throwable  {
-      TimeMetricsGenerator timeMetricsGenerator0 = new TimeMetricsGenerator();
-      timeMetricsGenerator0.startRecording((Method) null);
+      TimeMetricsGenerator timeMetricsGenerator0 = new TimeMetricsGenerator(null);
+      timeMetricsGenerator0.collectBefore((Class)null,(Selector) null,(Method) null, (Object[])null);
       System.setCurrentTimeMillis(0L);
       try { 
-        timeMetricsGenerator0.finishRecording((Method) null, (String) null, "KbSIS-q^sc<>B;f");
+        timeMetricsGenerator0.collectAfter((Class)null,(Selector) null,(Method) null, (Object[])null,(Object) null);
         fail("Expecting exception: NullPointerException");
       
       } catch(NullPointerException e) {
@@ -38,7 +39,7 @@ public class TimeMetricsGenerator_ESTest extends TimeMetricsGenerator_ESTest_sca
 
   @Test(timeout = 4000)
   public void test1()  throws Throwable  {
-      TimeMetricsGenerator timeMetricsGenerator0 = new TimeMetricsGenerator();
+      TimeMetricsGenerator timeMetricsGenerator0 = new TimeMetricsGenerator(null);
       MetricRecorderLogger metricRecorderLogger0 = new MetricRecorderLogger();
       timeMetricsGenerator0.setMetricRecorder(metricRecorderLogger0);
       MetricRecorder metricRecorder0 = timeMetricsGenerator0.getMetricRecorder();
@@ -47,7 +48,7 @@ public class TimeMetricsGenerator_ESTest extends TimeMetricsGenerator_ESTest_sca
 
   @Test(timeout = 4000)
   public void test2()  throws Throwable  {
-      TimeMetricsGenerator timeMetricsGenerator0 = new TimeMetricsGenerator();
+      TimeMetricsGenerator timeMetricsGenerator0 = new TimeMetricsGenerator(null);
       MetricRecorder metricRecorder0 = timeMetricsGenerator0.getMetricRecorder();
       assertNull(metricRecorder0);
   }

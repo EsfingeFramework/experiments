@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -75,7 +76,7 @@ public class SelectorWithPersistence implements Selector {
     }
 
     @Override
-    public Class select(Class[] implementations) {
+    public Class select(Class[] implementations, Object[] args, Method m) {
         Class result = null;
         readData();
         String id = getIp();
@@ -91,7 +92,7 @@ public class SelectorWithPersistence implements Selector {
         }
 
         if (selected == null) {
-            result = selector.select(implementations);
+            result = selector.select(implementations, args,m);
             selected = result.getName();
 
             String ls = System.getProperty("line.separator");

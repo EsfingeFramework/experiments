@@ -2,6 +2,8 @@ package esfinge.cnext;
 
 import esfinge.cnext.factories.Metrics;
 import esfinge.cnext.factories.Selector;
+import esfinge.cnext.metricscolector.MetricsCollector;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -10,20 +12,16 @@ import java.util.logging.Logger;
 
 public class ABTestProxy<R> implements InvocationHandler {
 
-    private List<Metrics> metrics;
+
     private Selector selector;
     private Class[] implementations;
+
+    private MetricsCollector metricsCollectorChain;
 
     public ABTestProxy() {
     }
 
-    protected List<Metrics> getMetrics() {
-        return metrics;
-    }
 
-    protected void setMetrics(List<Metrics> metrics) {
-        this.metrics = metrics;
-    }
 
     protected Selector getSelector() {
         return selector;
@@ -41,26 +39,21 @@ public class ABTestProxy<R> implements InvocationHandler {
         this.implementations = implementations;
     }
 
+    public MetricsCollector getMetricsCollectorChain() {
+        return metricsCollectorChain;
+    }
+
+    public void setMetricsCollectorChain(MetricsCollector metricsCollectorChain) {
+        this.metricsCollectorChain = metricsCollectorChain;
+    }
+
     @Override
     public R invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-        Class implementation = selector.select(implementations);
+        Class implementation = selector.select(implementations,args,method);
 
-        try {
-            for (Metrics metric : metrics) {
-                metric.startRecording(method);
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        }
-        R methodResult = (R) (method.invoke(implementation.newInstance(), args));
-        try {
-            for (Metrics metric : metrics) {
-                metric.finishRecording(method, selector.getClass().getSimpleName(), implementation.getSimpleName());
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        }
+        R methodResult = (R) getMetricsCollectorChain().collect(implementation,selector, method, args);
+
         return methodResult;
     }
 }

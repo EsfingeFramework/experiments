@@ -16,6 +16,7 @@ public class MetricResult {
         this.result = result;
     }
 
+
     public String getMetric() {
         return metric;
     }
