@@ -270,12 +270,13 @@ public @interface targetParameter {
 
 ```
 @OrderValue
-public interface ImplementationInterface {
+public interface PlaceOrder {
     void placeOrder(int orderID, Item item , @targetParameter User user);
 }
 ```
 
 We use the targetParameter annotation to specify in the implementations which of the parameters will contain the information about the company.
+PlaceOrder is the interface that will contain the abstraction needed for our tests. In this case the implementations will have the method *placeOrder* in common.
 The company information is used to select specific implementations for specific companies:
 
 ```
